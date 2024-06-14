@@ -1,5 +1,5 @@
 [package]
-name = "quick-start-rs"
+name = "shortener_svc"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,3 +7,14 @@ edition = "2021"
 
 [dependencies]
 thiserror = "1.0.61"
+anyhow = "1.0.86"
+tokio = { version = "1.37.0", features = ["rt", "rt-multi-thread", "macros", "net"] }
+axum = { version = "0.7.5", features = ["http2", "query", "tracing", "macros"] }
+http = "1.1.0"
+toml = "0.8.14"
+serde = { version = "1.0.203", features = ["derive"] }
+sqlx = { version = "0.7.4", features = ["postgres", "runtime-tokio", "tls-rustls"] }
+tracing = "0.1.40"
+url = "2.5.0"
+nanoid = "0.4.0"
+async-trait = "0.1.80"
