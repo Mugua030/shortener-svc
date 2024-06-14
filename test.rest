@@ -1,0 +1,10 @@
+### url test
+GET http://localhost:8089/mshsw
+
+### post request to gen shorten
+POST http://localhost:8089/ 
+Content-Type: application/json
+
+{
+    "url":"https://www.google.com"
+}
