@@ -3,6 +3,7 @@ use std::error::Error;
 use sqlx::{FromRow, PgPool};
 use async_trait::async_trait;
 use crate::entity::*;
+use crate::error::AppError;
 
 #[derive(Clone)]
 pub struct Repo {
@@ -22,10 +23,10 @@ impl Repo {
 // database
 #[async_trait]
 pub trait DBStore: CloneableDBStore + Send + Sync {
-    async fn create(&self, id: String, url: String) -> Result<String, anyhow::Error>;
-    async fn update(&self, sql: &str) -> Result<bool, Box<dyn Error>>;
-    async fn delete(&self, sql: &str) -> Result<bool, Box<dyn Error>>;
-    async fn fetch_one(&self, id: &str) -> Result<String>;
+    async fn create(&self, id: String, url: String) -> Result<String, sqlx::Error>;
+    async fn update(&self, sql: &str) -> Result<bool, sqlx::Error>;
+    async fn delete(&self, sql: &str) -> Result<bool, sqlx::Error>;
+    async fn fetch_one(&self, id: &str) -> Result<String, sqlx::Error>;
 }
 
 pub trait CloneableDBStore: Send + Sync {
@@ -62,7 +63,7 @@ impl DBPostgres {
 
 #[async_trait]
 impl DBStore for DBPostgres {
-    async fn create(&self, id: String, url: String) -> Result<String, anyhow::Error> {
+    async fn create(&self, id: String, url: String) -> Result<String, sqlx::Error> {
         let sql = "INSERT INTO urls (id, url) VALUES ($1, $2) ON CONFLICT(url) DO UPDATE SET url=EXCLUDED.url RETURNING id";
         let ret: UrlRecord = sqlx::query_as(sql)
             .bind(&id)
@@ -73,15 +74,15 @@ impl DBStore for DBPostgres {
         Ok(ret.id)
     }
 
-    async fn delete(&self, sql: &str) -> Result<bool, Box<dyn Error>> {
+    async fn delete(&self, sql: &str) -> Result<bool, sqlx::Error> {
         todo!()
     }
 
-    async fn update(&self, sql: &str) -> Result<bool, Box<dyn Error>> {
+    async fn update(&self, sql: &str) -> Result<bool, sqlx::Error> {
         todo!()
     }
 
-    async fn fetch_one(&self, id: &str) -> Result<String> {
+    async fn fetch_one(&self, id: &str) -> Result<String, sqlx::Error> {
         let ret: UrlRecord = sqlx::query_as("SELECT url FROM urls WHERE id = $1")
             .bind(id)
             .fetch_one(&self.db)
